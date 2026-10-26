@@ -1,8 +1,10 @@
+const path = require('path');
+
 module.exports = {
   apps: [
     {
       name: 'ub-portal-monitor',
-      script: './dist/index.js',
+      script: path.resolve(__dirname, 'dist', 'index.js'),
       cwd: __dirname,
       instances: 1,
       autorestart: true,
@@ -12,8 +14,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
       },
-      error_file: './logs/error.log',
-      out_file: './logs/combined.log',
+      error_file: path.resolve(__dirname, 'logs', 'error.log'),
+      out_file: path.resolve(__dirname, 'logs', 'combined.log'),
       merge_logs: true,
     },
   ],
