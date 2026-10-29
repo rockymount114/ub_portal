@@ -3,8 +3,26 @@ import { checkUrl, StatusTracker } from './monitor';
 import { sendTelegramMessage } from './telegram';
 
 function formatTimestamp(): string {
-  return new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+    timeZoneName: 'short',
+  }).formatToParts(new Date());
+
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? '';
+
+  return `${value('year')}-${value('month')}-${value('day')} ` +
+    `${value('hour')}:${value('minute')}:${value('second')} ` +
+    `${value('timeZoneName')}`;
 }
+
 
 async function main() {
   const config = loadConfig();
@@ -67,7 +85,7 @@ async function main() {
       if (transition === 'TRANSITION_TO_DOWN') {
         console.warn(`[${formatTimestamp()}] TRIGGERING DOWN ALERT to Telegram!`);
         const downMessage = [
-          `🚨 <b>ALERT: Website is DOWN!</b>`,
+          `🚨 <b>ALERT: UB Portal Website is DOWN!</b>`,
           ``,
           `🔗 <b>Target:</b> <code>${config.targetUrl}</code>`,
           `❌ <b>Issue:</b> ${result.reason || 'Service unreachable'}`,
@@ -80,7 +98,7 @@ async function main() {
       } else if (transition === 'TRANSITION_TO_UP') {
         console.log(`[${formatTimestamp()}] TRIGGERING RECOVERY ALERT to Telegram!`);
         const upMessage = [
-          `✅ <b>RESOLVED: Website is Back ONLINE!</b>`,
+          `✅ <b>RESOLVED: UB Portal Website is Back ONLINE!</b>`,
           ``,
           `🔗 <b>Target:</b> <code>${config.targetUrl}</code>`,
           `📶 <b>Status:</b> HTTP ${result.statusCode} OK`,
